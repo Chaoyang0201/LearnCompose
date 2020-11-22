@@ -1,3 +1,14 @@
+*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+### Android template
 # Built application files
 *.apk
 *.aar
@@ -83,3 +94,5 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 # lint/reports/
+# Android Profiling
+*.hprof
