@@ -1,2 +1,3 @@
 rootProject.name = "JetpackComposeTryout"
 include ':compose-basics'
+include ':compose-layouts'
