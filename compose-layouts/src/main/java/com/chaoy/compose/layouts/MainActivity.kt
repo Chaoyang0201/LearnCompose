@@ -8,11 +8,11 @@ import androidx.compose.foundation.ScrollableRow
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
@@ -30,6 +30,7 @@ import com.chaoy.compose.layouts.ui.JetpackComposeTryoutTheme
 import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
+    @ExperimentalLayout
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d("MainActivity", "onCreate: ")
@@ -77,6 +78,7 @@ fun PhotographerProfile(modifier: Modifier = Modifier) {
 }
 
 
+@ExperimentalLayout
 @Composable
 fun LayoutsCodelab() {
     Scaffold(topBar = {
@@ -92,23 +94,142 @@ fun LayoutsCodelab() {
                 }
         )
     }) {
-        val random = Random(1000)
+        Row(modifier = Modifier.fillMaxWidth().preferredHeight(intrinsicSize = IntrinsicSize.Min).background(color = Color.LightGray)) {
+            Text(text = "Hi", modifier = Modifier.weight(1f).wrapContentWidth(align = Alignment.Start))
+            Divider(color = Color.Black, modifier = Modifier.fillMaxHeight().preferredWidth(1.dp))
+            Text(text = "there", modifier = Modifier.weight(1f).wrapContentWidth(align = Alignment.End))
+        }
+    }
+}
+
+@Composable
+fun DecoupledConstraintsLayoutExample() {
+    WithConstraints {
+        val constraints = if (maxWidth < maxHeight) {
+            decoupledConstraints(margin = 16.dp)
+        } else {
+            decoupledConstraints(margin = 32.dp)
+        }
 
 
-        ScrollableRow {
-            StaggeredGrid(rows = 4) {
-                for (i in 0..100) {
-                    val randomColor = Color(red = random.nextInt(0, 255), green = random.nextInt(0, 255), blue = random.nextInt(0, 255))
-                    val length = random.nextInt(1, 20)
-                    val text = buildString {
-                        (0..length).forEach { _ -> append("${length % 9}") }
-                    }
+        ConstraintLayout(constraintSet = constraints) {
+            Button(onClick = {}, modifier = Modifier.layoutId("button")) {
+                Text("Button")
+            }
 
-                    Chip(modifier = Modifier.padding(4.dp), color = randomColor, text = text)
+            Text("Text", modifier = Modifier.layoutId("text"))
+        }
+    }
+}
 
+fun decoupledConstraints(margin: Dp): ConstraintSet {
+    return ConstraintSet {
+        val button = createRefFor("button")
+        val text = createRefFor("text")
+
+        constrain(button) {
+            centerTo(parent)
+        }
+
+        constrain(text) {
+            start.linkTo(button.end, margin = margin)
+            top.linkTo(button.bottom, margin = margin)
+        }
+    }
+}
+
+@Composable
+private fun StaggerGridExample() {
+    val random = Random(1000)
+
+
+    ScrollableRow {
+        StaggeredGrid(rows = 4) {
+            for (i in 0..100) {
+                val randomColor = Color(red = random.nextInt(0, 255), green = random.nextInt(0, 255), blue = random.nextInt(0, 255))
+                val length = random.nextInt(1, 20)
+                val text = buildString {
+                    (0..length).forEach { _ -> append("${length % 9}") }
                 }
+
+                Chip(modifier = Modifier.padding(4.dp), color = randomColor, text = text)
+
             }
         }
+    }
+}
+
+
+@Composable
+fun ConstraintLayoutExample() {
+    Column(modifier = Modifier.fillMaxHeight()) {
+        ConstraintLayout(modifier = Modifier.background(color = Color.LightGray).fillMaxWidth().fillMaxHeight(.5f)) {
+            val (button, text, icon, row) = createRefs()
+            //
+            val barrier = createEndBarrier(button, icon)
+
+            Button(
+                    onClick = {},
+                    modifier = Modifier
+                            .fillMaxWidth()
+                            .constrainAs(button) {
+                                top.linkTo(parent.top, margin = 16.dp)
+
+                            },
+            ) {
+                Text("Button")
+            }
+
+            Text(
+                    text = "Text",
+                    modifier = Modifier.constrainAs(text) {
+                        top.linkTo(button.bottom, margin = 16.dp)
+                    },
+            )
+
+
+            IconButton(
+                    onClick = {},
+                    modifier = Modifier.constrainAs(icon) { centerTo(parent) },
+            ) {
+
+                Row(modifier = Modifier.background(Color.Yellow)) {
+                    Icon(asset = Icons.Default.Face)
+                    Text("Face")
+                }
+
+
+            }
+
+            Row(modifier = Modifier.background(Color.Yellow).constrainAs(row) {
+                top.linkTo(icon.bottom)
+                end.linkTo(barrier)
+            }) {
+                Icon(asset = Icons.Default.Face)
+                Text("Face11111111122222222")
+            }
+
+        }
+
+
+    }
+}
+
+@Composable
+private fun GuidelineSample() {
+    ConstraintLayout(modifier = Modifier.background(Color.DarkGray).fillMaxWidth(.6f).fillMaxHeight()) {
+        val text = createRef()
+
+        val guideline = createGuidelineFromStart(.5f)
+
+        Text(
+                text = "This is a very very very very very very very very very long text", color = Color.White,
+                modifier = Modifier.constrainAs(text) {
+                    width = Dimension.fillToConstraints
+                    linkTo(start = guideline, end = parent.end)
+                },
+        )
+
     }
 }
 
@@ -170,6 +291,7 @@ fun DefaultPreview() {
     Chip(color = Color.Red, text = "This is a chip view")
 }
 
+@ExperimentalLayout
 @Preview
 @Composable
 fun StaggerGridPreview() {
