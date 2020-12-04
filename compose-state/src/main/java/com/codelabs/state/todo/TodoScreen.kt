@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumnFor
+import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.Button
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
@@ -84,10 +85,16 @@ fun TodoRow(todo: TodoItem, onItemClicked: (TodoItem) -> Unit, modifier: Modifie
         modifier = modifier
             .clickable { onItemClicked(todo) }
             .padding(horizontal = 16.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
+
+//        val iconAlpha = remember { randomTint() } //never invalid
+        val iconAlpha = remember(todo.id) { randomTint() } // invalid when id changed
         Text(todo.task)
-        Icon(todo.icon.vectorAsset)
+        Icon(
+            todo.icon.vectorAsset,
+            tint = AmbientContentColor.current.copy(alpha = iconAlpha),
+        )
     }
 }
 
