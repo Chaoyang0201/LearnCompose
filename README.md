@@ -8,7 +8,7 @@ ref: https://developer.android.com/courses/pathways/compose
     - ref: https://developer.android.com/codelabs/jetpack-compose-layouts
 - module: compose-state
     - ref: https://developer.android.com/codelabs/jetpack-compose-state
-    - bookmark: https://developer.android.com/codelabs/jetpack-compose-state#4
+    - bookmark: https://developer.android.com/codelabs/jetpack-compose-state#8
 
 ## issues:
 

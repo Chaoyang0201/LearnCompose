@@ -50,7 +50,7 @@ fun TodoScreen(
 
     Column {
         TodoItemInputBackground(elevate = true, modifier = Modifier.fillMaxWidth()) {
-            TodoItemInput(onItemComplete = onAddItem)
+            TodoItemEntryInput(onItemComplete = onAddItem)
         }
 
         LazyColumnFor(
@@ -131,13 +131,13 @@ fun PreviewTodoRow() {
 @Preview
 @Composable
 fun PreviewTodoItemInput() {
-    TodoItemInput(onItemComplete = {})
+    TodoItemEntryInput(onItemComplete = {})
 
 
 }
 
 @Composable
-fun TodoItemInput(onItemComplete: (TodoItem) -> Unit) {
+fun TodoItemEntryInput(onItemComplete: (TodoItem) -> Unit) {
     val (text, setText) = remember { mutableStateOf("") }
     val (icon, setIcon) = remember { mutableStateOf(TodoIcon.Default) }
     val iconsVisible = text.isNotBlank()
@@ -146,13 +146,33 @@ fun TodoItemInput(onItemComplete: (TodoItem) -> Unit) {
         setIcon(TodoIcon.Default)
         setText("")
     }
+    TodoItemInput(
+        text = text,
+        onTextChange = setText,
+        submit = submit,
+        iconsVisible = iconsVisible,
+        icon = icon,
+        onIconChange = setIcon
+    )
+
+}
+
+@Composable
+fun TodoItemInput(
+    text: String,
+    onTextChange: (String) -> Unit,
+    submit: () -> Unit,
+    iconsVisible: Boolean,
+    icon: TodoIcon,
+    onIconChange: (TodoIcon) -> Unit
+) {
     Column {
         Row(Modifier.padding(horizontal = 16.dp).padding(top = 16.dp)) {
 
             val modifier = Modifier.weight(1f).padding(end = 8.dp)
             TodoInputText(
                 text = text,
-                onTextChange = setText,
+                onTextChange = onTextChange,
                 modifier = modifier,
                 onImeAction = submit
             )
@@ -167,7 +187,7 @@ fun TodoItemInput(onItemComplete: (TodoItem) -> Unit) {
         if (iconsVisible) {
             AnimatedIconRow(
                 icon = icon,
-                onIconChange = setIcon,
+                onIconChange = onIconChange,
                 modifier = Modifier.padding(top = 8.dp)
             )
 
@@ -175,5 +195,4 @@ fun TodoItemInput(onItemComplete: (TodoItem) -> Unit) {
             Spacer(modifier = Modifier.preferredHeight(16.dp))
         }
     }
-
 }
